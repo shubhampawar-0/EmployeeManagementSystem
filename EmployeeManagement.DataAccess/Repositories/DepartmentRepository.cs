@@ -24,57 +24,82 @@ namespace EmployeeManagement.DataAccess.Repositories
 
         public IEnumerable<Department> GetDepartments()
         {
-            var departmentlist = new List<Department>();
-
-            using ( var con = _dbConnectionHelper.CreateConnection())
+            try
             {
-                con.Open();
 
-                using (var  cmd = new SqlCommand("SELECT DepartmentId, DepartmentName FROM Departments", (SqlConnection)con))
+                var departmentlist = new List<Department>();
+
+                using (
+
+
+                    var con = _dbConnectionHelper.CreateConnection())
                 {
-                    using (var reader = cmd.ExecuteReader())
+                    con.Open();
+
+                    using (var cmd = new SqlCommand("SELECT DepartmentId, DepartmentName FROM Departments", (SqlConnection)con))
                     {
-                        while (reader.Read())
+                        using (var reader = cmd.ExecuteReader())
                         {
-                            departmentlist.Add(new Department
+                            while (reader.Read())
                             {
-                                DepartmentId = (int)reader["DepartmentId"],
-                                DepartmentName = reader["DepartmentName"].ToString()
-                            });
+                                departmentlist.Add(new Department
+                                {
+                                    DepartmentId = (int)reader["DepartmentId"],
+                                    DepartmentName = reader["DepartmentName"].ToString()
+                                });
+                            }
                         }
                     }
                 }
+
+                return departmentlist;
+            }
+            catch (Exception ex)
+            {
+
+                throw ex;
             }
 
-            return departmentlist;
+
         }
 
         public Department GetDepartmentById(int id)
         {
-            Department dept = null;
 
-            using (var conn = _dbConnectionHelper.CreateConnection())
+            try
             {
-                conn.Open();
-                using (var cmd = new SqlCommand("SELECT DepartmentId, DepartmentName FROM Departments WHERE DepartmentId=@Id", (SqlConnection)conn))
-                {
-                    // Correct way to add parameter
-                    cmd.Parameters.AddWithValue("@Id", id);
+                Department dept = null;
 
-                    using (var reader = cmd.ExecuteReader())
+                using (var conn = _dbConnectionHelper.CreateConnection())
+                {
+                    conn.Open();
+                    using (var cmd = new SqlCommand("SELECT DepartmentId, DepartmentName FROM Departments WHERE DepartmentId=@Id", (SqlConnection)conn))
                     {
-                        if (reader.Read()) // Reads the first row if exists
+                        // Correct way to add parameter
+                        cmd.Parameters.AddWithValue("@Id", id);
+
+                        using (var reader = cmd.ExecuteReader())
                         {
-                            dept = new Department
+                            if (reader.Read()) // Reads the first row if exists
                             {
-                                DepartmentId = (int)reader["DepartmentId"],
-                                DepartmentName = reader["DepartmentName"].ToString()
-                            };
+                                dept = new Department
+                                {
+                                    DepartmentId = (int)reader["DepartmentId"],
+                                    DepartmentName = reader["DepartmentName"].ToString()
+                                };
+                            }
                         }
                     }
                 }
+                return dept; // Will be null if not found
             }
-            return dept; // Will be null if not found
+            catch (Exception ex )
+            {
+
+                throw ex;
+            }
+
+            
         }
 
         public bool AddDepartment(Department dept)
